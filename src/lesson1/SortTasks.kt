@@ -2,6 +2,9 @@
 
 package lesson1
 
+import java.io.File
+import kotlin.math.roundToInt
+
 /**
  * Сортировка времён
  *
@@ -95,9 +98,27 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 24.7
  * 99.5
  * 121.3
+ *
+ * T = O(N)
+ * R = O(N)
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val inputStream = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+    val list = mutableListOf<Int>()
+
+    for (i in inputStream) {
+        list.add((i.toDouble() * 10).toInt() + 2730)
+    }
+
+    val res = countingSort(list.toIntArray(), 7730)
+    for (i in res) {
+        val ans = i.toDouble() / 10 - 273
+        val r = (ans * 100).roundToInt() / 100.0
+        result.write("$r")
+        result.newLine()
+    }
+    result.close()
 }
 
 /**
@@ -128,9 +149,50 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  * 2
+ *
+ * R = O(N)
+ * T = O(N log N)
  */
 fun sortSequence(inputName: String, outputName: String) {
-    TODO()
+    val inputStream = File(inputName).readLines()
+    val result = File(outputName).bufferedWriter()
+    val maxRepeats = mutableListOf<Int>()
+    val map = mutableMapOf<Int, Int?>()
+    var count = 0
+
+    for (i in inputStream) {
+        if (!map.containsKey(i.toInt())) {
+            map[i.toInt()] = 1
+        } else {
+            val keyPlus = map[i.toInt()]?.plus(1)
+            map[i.toInt()] = keyPlus
+            if (keyPlus != null && keyPlus > count) {
+                maxRepeats.clear()
+                count = keyPlus
+                maxRepeats.add(i.toInt())
+            }
+            if (keyPlus != null && keyPlus == count) {
+                maxRepeats.add(i.toInt())
+            }
+        }
+    }
+
+    maxRepeats.sort()
+    val max = if (maxRepeats.isNotEmpty()) maxRepeats[0] else -1
+
+    for (number in inputStream) {
+        if (number.toInt() != max) {
+            result.write(number)
+            result.newLine()
+        }
+    }
+    if (max > 0) {
+        for (f in 1..map[max]!!) {
+            result.write(max.toString())
+            result.newLine()
+        }
+    }
+    result.close()
 }
 
 /**
@@ -147,7 +209,15 @@ fun sortSequence(inputName: String, outputName: String) {
  *
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
+// T = O(N log N)
+// R = O(N)
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    TODO()
+    var x = 0
+    while (second[x] == null) {
+        second[x] = first[x]
+        x++
+    }
+
+    second.sort()
 }
 
