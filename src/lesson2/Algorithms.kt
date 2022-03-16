@@ -2,6 +2,9 @@
 
 package lesson2
 
+import kotlin.math.floor
+import kotlin.math.sqrt
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -79,9 +82,16 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  * Общий комментарий: решение из Википедии для этой задачи принимается,
  * но приветствуется попытка решить её самостоятельно.
  */
+// T = O(N)
+// R = O(N)
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
-    TODO()
+    var result = 0
+    for (i in 1..menNumber) {
+        result = (result + choiceInterval) % i
+    }
+    return result + 1
 }
+
 
 /**
  * Наибольшая общая подстрока.
@@ -95,7 +105,27 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * вернуть ту из них, которая встречается раньше в строке first.
  */
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    val array = Array(first.length) { IntArray(second.length) }
+    var pair = Pair(0, 0)
+    var c = 0
+
+    for (i in first.indices) {
+        for (j in second.indices) {
+            if (first[i] == second[j]) {
+                if (i != 0 && j != 0) {
+                    array[i][j] = array[i - 1][j - 1] + 1
+                } else array[i][j] = 1
+                c = array[i][j]
+                if (c > pair.first) {
+                    pair = c to i
+                }
+            } else {
+                array[i][j] = 0
+            }
+        }
+    }
+    return if (c != 0) first.subSequence(pair.second - pair.first + 1, pair.second + 1).toString()
+    else ""
 }
 
 /**
@@ -109,5 +139,21 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Единица простым числом не считается.
  */
 fun calcPrimesNumber(limit: Int): Int {
-    TODO()
+    if (limit <= 1) return 0
+    if (limit == 2) return 1
+    var res = 0
+    for (i in 1..limit step 2) {
+        var flag = true
+        for (j in 2..floor(sqrt(i.toDouble())).toInt()) {
+            if ((i % j) == 0) {
+                flag = false
+                break
+            }
+        }
+        if (flag) {
+            res++
+        }
+    }
+    return res
 }
+

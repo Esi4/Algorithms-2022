@@ -151,47 +151,40 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  *
  * R = O(N)
- * T = O(N log N)
+ * T = O(N)
  */
 fun sortSequence(inputName: String, outputName: String) {
-    val inputStream = File(inputName).readLines()
+    val list = File(inputName).readLines().toList()
     val result = File(outputName).bufferedWriter()
-    val maxRepeats = mutableListOf<Int>()
-    val map = mutableMapOf<Int, Int?>()
-    var count = 0
+    val map = mutableMapOf<Int, Int>()
+    var max = Pair(0, 0)
 
-    for (i in inputStream) {
-        if (!map.containsKey(i.toInt())) {
-            map[i.toInt()] = 1
-        } else {
-            val keyPlus = map[i.toInt()]?.plus(1)
-            map[i.toInt()] = keyPlus
-            if (keyPlus != null && keyPlus > count) {
-                maxRepeats.clear()
-                count = keyPlus
-                maxRepeats.add(i.toInt())
-            }
-            if (keyPlus != null && keyPlus == count) {
-                maxRepeats.add(i.toInt())
-            }
+    for (i in list) {
+        val k = i.toInt()
+        map[k] = map.getOrDefault(k, 0) + 1
+    }
+
+    for ((key, value) in map) {
+        if (max.second == value && max.first > key) {
+            max = key to value
+        }
+        if (max.second < value) {
+            max = key to value
         }
     }
 
-    maxRepeats.sort()
-    val max = if (maxRepeats.isNotEmpty()) maxRepeats[0] else -1
-
-    for (number in inputStream) {
-        if (number.toInt() != max) {
+    for (number in list) {
+        if (number.toInt() != max.first) {
             result.write(number)
             result.newLine()
         }
     }
-    if (max > 0) {
-        for (f in 1..map[max]!!) {
-            result.write(max.toString())
-            result.newLine()
-        }
+
+    for (i in 1..max.second) {
+        result.write(max.first.toString())
+        result.newLine()
     }
+
     result.close()
 }
 
@@ -209,15 +202,22 @@ fun sortSequence(inputName: String, outputName: String) {
  *
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
-// T = O(N log N)
+// T = O(N)
 // R = O(N)
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    var x = 0
-    while (second[x] == null) {
-        second[x] = first[x]
-        x++
+    val secSize = second.size
+    var frtSize = first.size
+    var z = 0
+    for (i in second.indices) {
+        if (z == first.size) {
+            second[i] = second[frtSize++]
+        } else if (frtSize == secSize) {
+            second[i] = first[z++]
+        } else if (first[z] < second[frtSize]!!) {
+            second[i] = first[z++]
+        } else {
+            second[i] = second[frtSize++]
+        }
     }
-
-    second.sort()
 }
 

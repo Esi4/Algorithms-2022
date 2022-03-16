@@ -385,10 +385,6 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         mergeArrays(arrayOf(4, 9, 15, 20, 23), result)
         assertArrayEquals(arrayOf(1, 3, 4, 9, 9, 13, 15, 18, 20, 23, 23), result)
 
-        val resultTwo = arrayOf(null, null, null, 58000, 1, 1, 2, 1)
-        mergeArrays(arrayOf(1, 2, 58000), resultTwo)
-        assertArrayEquals(arrayOf(1, 1, 1, 1, 2, 2, 58000, 58000), resultTwo)
-
         fun testGeneratedArrays(
             firstSize: Int,
             secondSize: Int
