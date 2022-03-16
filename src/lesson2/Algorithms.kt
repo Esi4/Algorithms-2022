@@ -104,6 +104,8 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * Если имеется несколько самых длинных общих подстрок одной длины,
  * вернуть ту из них, которая встречается раньше в строке first.
  */
+// R = O(N ^ 2)
+// T = O(N ^ 2)
 fun longestCommonSubstring(first: String, second: String): String {
     val array = Array(first.length) { IntArray(second.length) }
     var pair = Pair(0, 0)
@@ -138,6 +140,8 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
  */
+// R = O(1) счет на месте
+// Т = O(N/2 * sqrt(M))
 fun calcPrimesNumber(limit: Int): Int {
     if (limit <= 1) return 0
     if (limit == 2) return 1
