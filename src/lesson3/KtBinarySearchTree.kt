@@ -11,6 +11,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
     ) {
         var left: Node<T>? = null
         var right: Node<T>? = null
+        var parent: Node<T>? = null //добавляем переменную-родителя узла
     }
 
     private var root: Node<T>? = null
@@ -35,6 +36,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         return closest != null && element.compareTo(closest.value) == 0
     }
 
+
     /**
      * Добавление элемента в дерево
      *
@@ -57,10 +59,12 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
             comparison < 0 -> {
                 assert(closest.left == null)
                 closest.left = newNode
+                newNode.parent = closest //при добавлении нового узла, также добавляем данные об его родителе
             }
             else -> {
                 assert(closest.right == null)
                 closest.right = newNode
+                newNode.parent = closest //Аналогично выше-написанному
             }
         }
         size++
@@ -79,8 +83,56 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
      *
      * Средняя
      */
+    //алгоритм взять с ru.wikipedia.org/wiki/Двоичное_дерево_поиска#Удаление_узла_(REMOVE)
+    //Т = O(N) при хорошем раскладе
+    //Т = О(log(N)) при нехорошем раскладе
+    //R = O(1)
     override fun remove(element: T): Boolean {
-        TODO()
+        if (find(element) == null || find(element)?.value != element || root == null) return false
+
+        val deleteElement = find(element)
+
+        when {
+            deleteElement!!.right == null -> removeOneChild(deleteElement, true) //если у узла левый потомок
+            deleteElement.left == null -> removeOneChild(deleteElement, false) //если у узла правый потомок
+            else -> removeTwoChild(deleteElement) //если у узла два потомка
+        }
+        size--
+        return true
+    }
+
+    //метод, меняющий местами два узла\\
+    private fun changeGen(elementA: Node<T>, elementB: Node<T>?) {
+        if (elementA.parent != null) {
+            if (elementA.parent!!.right != elementA) elementA.parent!!.left = elementB
+            else elementA.parent!!.right = elementB
+        } else root = elementB
+
+        if (elementB != null) {
+            elementA.parent = elementB.parent
+        }
+    }
+
+    //метод, удаляющий узел с одним потомком\\
+    private fun removeOneChild(node: Node<T>, flag: Boolean) {
+        if (flag) changeGen(node, node.left)
+        else changeGen(node, node.right)
+    }
+
+    //метод, удаляющий узел с двумя потомками\\
+    private fun removeTwoChild(node: Node<T>) {
+        var changeBuffer = node.right
+
+        while (changeBuffer!!.left != null) changeBuffer = changeBuffer.left
+
+        if (node != changeBuffer.parent) {
+            changeGen(changeBuffer, changeBuffer.right)
+            changeBuffer.right = node.right
+            changeBuffer.right!!.parent = changeBuffer
+        }
+        changeGen(node, changeBuffer)
+        changeBuffer.left = node.left
+        changeBuffer.left!!.parent = changeBuffer
     }
 
     override fun comparator(): Comparator<in T>? =
@@ -90,6 +142,20 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         BinarySearchTreeIterator()
 
     inner class BinarySearchTreeIterator internal constructor() : MutableIterator<T> {
+
+        private val stack: Stack<Node<T>> = Stack()
+        private var next: Node<T>? = null
+        private var curr = root
+
+        private fun pux(node: Node<T>) {
+            stack.push(node);
+            node.left?.let { pux(it) };
+        }
+
+        init {
+            curr?.let { pux(it) }
+        }
+
 
         /**
          * Проверка наличия следующего элемента
@@ -101,9 +167,11 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Средняя
          */
+
+        //T = O(1)
+        //R = O(1)
         override fun hasNext(): Boolean {
-            // TODO
-            throw NotImplementedError()
+            return !stack.isEmpty()
         }
 
         /**
@@ -119,9 +187,17 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Средняя
          */
+
+        //T = O(N)
+        //R = O(1)
         override fun next(): T {
-            // TODO
-            throw NotImplementedError()
+            if (!hasNext()) throw NoSuchElementException()
+
+            val node = stack.pop()
+
+            next = node
+            node.right?.let { pux(it) }
+            return node.value;
         }
 
         /**
@@ -136,9 +212,14 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Сложная
          */
+
+        // T = O(N) при хорошем раскладе
+        // Т = O(log(N)) при нехорошем раскладе
+        // R = O(1)
         override fun remove() {
-            // TODO
-            throw NotImplementedError()
+            if (next == null) throw IllegalStateException()
+            remove(next!!.value)
+            next = null
         }
 
     }

@@ -140,24 +140,30 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
  */
-// R = O(1) счет на месте
-// Т = O(N/2 * sqrt(M))
+// R = O(Nlog(log(N)))
+// Т = O(N)
 fun calcPrimesNumber(limit: Int): Int {
     if (limit <= 1) return 0
     if (limit == 2) return 1
-    var res = 0
-    for (i in 1..limit step 2) {
-        var flag = true
-        for (j in 2..floor(sqrt(i.toDouble())).toInt()) {
-            if ((i % j) == 0) {
-                flag = false
-                break
+
+    val boolArray = mutableListOf<Boolean>()
+
+    for (i in 0 until limit + 1) {
+        if (i == 1 || i == 0) {
+            boolArray.add(false)
+        } else boolArray.add(true)
+    }
+
+
+    for (i in 2 until boolArray.size) {
+        var z = 2
+        if (boolArray[i]) {
+            while (i * z < boolArray.size) {
+                boolArray[i * z] = false
+                ++z
             }
         }
-        if (flag) {
-            res++
-        }
     }
-    return res
+    return boolArray.count { it }
 }
 

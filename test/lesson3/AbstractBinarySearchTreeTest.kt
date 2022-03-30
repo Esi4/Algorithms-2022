@@ -150,6 +150,10 @@ abstract class AbstractBinarySearchTreeTest {
                 binarySet.remove(toRemove),
                 "An element that was already not in the tree was supposedly removed."
             )
+            assertFalse(
+                binarySet.remove(555555555),
+                "No such element exists"
+            )
             assertEquals(
                 expectedSize, binarySet.size,
                 "The size of the tree is incorrect: was ${binarySet.size}, should've been $expectedSize."
@@ -192,6 +196,46 @@ abstract class AbstractBinarySearchTreeTest {
                 )
             }
             val controlIter = controlSet.iterator()
+            val binaryIter = binarySet.iterator()
+            println("Checking if the iterator traverses the tree correctly...")
+            while (controlIter.hasNext()) {
+                assertEquals(
+                    controlIter.next(), binaryIter.next(),
+                    "BinarySearchTreeIterator doesn't traverse the tree correctly."
+                )
+            }
+            assertFailsWith<NoSuchElementException>("Something was supposedly returned after the elements ended") {
+                binaryIter.next()
+            }
+            println("All clear!")
+        }
+
+        implementationTest { create().iterator().hasNext() }
+        implementationTest { create().iterator().next() }
+        val treeSetMyTest = TreeSet<Int>()
+        for (i in 1..14) {
+            treeSetMyTest.add(i)
+        }
+        for (iteration in 1..100) {
+            val binarySet = create()
+            println("Control set: $treeSetMyTest")
+            assertFalse(
+                binarySet.iterator().hasNext(),
+                "Iterator of an empty tree should not have any next elements."
+            )
+            for (element in treeSetMyTest) {
+                binarySet += element
+            }
+            val iterator1 = binarySet.iterator()
+            val iterator2 = binarySet.iterator()
+            println("Checking if calling hasNext() changes the state of the iterator...")
+            while (iterator1.hasNext()) {
+                assertEquals(
+                    iterator2.next(), iterator1.next(),
+                    "Calling BinarySearchTreeIterator.hasNext() changes the state of the iterator."
+                )
+            }
+            val controlIter = treeSetMyTest.iterator()
             val binaryIter = binarySet.iterator()
             println("Checking if the iterator traverses the tree correctly...")
             while (controlIter.hasNext()) {
@@ -271,6 +315,38 @@ abstract class AbstractBinarySearchTreeTest {
                 )
             }
             println("All clear!")
+        }
+
+        implementationTest { create().iterator().hasNext() }
+        implementationTest { create().iterator().next() }
+        val treeSetMyTest = TreeSet<Int>()
+        val toRemove = 0
+        for (i in 1..14) {
+            treeSetMyTest.add(i)
+        }
+        for (iteration in 1..100) {
+            println("Initial set: $treeSetMyTest")
+            val binarySet = create()
+            for (element in treeSetMyTest) {
+                binarySet += element
+            }
+            treeSetMyTest.remove(toRemove)
+            println("Control set: $treeSetMyTest")
+            println("Removing element $treeSetMyTest from the tree through the iterator...")
+            val iterator = binarySet.iterator()
+            assertFailsWith<IllegalStateException>("Something was supposedly removed before the iteration started") {
+                iterator.remove()
+            }
+            assertEquals(
+                treeSetMyTest.size, binarySet.size,
+                "The size of the tree is incorrect: was ${binarySet.size}, should've been ${treeSetMyTest.size}."
+            )
+            for (element in treeSetMyTest) {
+                assertTrue(
+                    binarySet.contains(element),
+                    "The tree doesn't have the element $element from the control set."
+                )
+            }
         }
     }
 
