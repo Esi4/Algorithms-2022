@@ -110,6 +110,45 @@ abstract class AbstractTrieTest {
             }
             println("All clear!")
         }
+
+        //MyTests\\
+        val myTestControlSet = sortedSetOf<String>()
+
+        myTestControlSet.add("bc")
+        myTestControlSet.add("Ad")
+        myTestControlSet.add("cccccC")
+
+        println("Control set: $myTestControlSet")
+        val trieSet = create()
+        assertFalse(
+            trieSet.iterator().hasNext(),
+            "Iterator of an empty set should not have any next elements."
+        )
+        for (element in myTestControlSet) {
+            trieSet += element
+        }
+        val iterator1 = trieSet.iterator()
+        val iterator2 = trieSet.iterator()
+        println("Checking if calling hasNext() changes the state of the iterator...")
+        while (iterator1.hasNext()) {
+            assertEquals(
+                iterator2.next(), iterator1.next(),
+                "Calling TrieIterator.hasNext() changes the state of the iterator."
+            )
+        }
+        val trieIter = trieSet.iterator()
+        println("Checking if the iterator traverses the entire set...")
+        while (trieIter.hasNext()) {
+            myTestControlSet.remove(trieIter.next())
+        }
+        assertTrue(
+            myTestControlSet.isEmpty(),
+            "TrieIterator doesn't traverse the entire set."
+        )
+        assertFailsWith<NoSuchElementException>("Something was supposedly returned after the elements ended") {
+            trieIter.next()
+        }
+        println("All clear!")
     }
 
     protected fun doIteratorRemoveTest() {
@@ -170,6 +209,24 @@ abstract class AbstractTrieTest {
                 )
             }
             println("All clear!")
+        }
+
+        val myTestControlSet = sortedSetOf<String>()
+
+        myTestControlSet.add("bc")
+        myTestControlSet.add("Ad")
+        myTestControlSet.add("cccccC")
+
+        val trieSet = create()
+        for (element in myTestControlSet) {
+            trieSet += element
+        }
+
+        for (element in myTestControlSet) {
+            assertTrue(
+                trieSet.contains(element),
+                "Trie set doesn't have the element $element from the control set."
+            )
         }
     }
 

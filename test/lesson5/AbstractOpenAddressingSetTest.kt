@@ -75,6 +75,11 @@ abstract class AbstractOpenAddressingSetTest {
                     expectedSize, openAddressingSet.size,
                     "The size of the set is not as expected."
                 )
+                openAddressingSet += 1
+                assertTrue(
+                    openAddressingSet.remove(1),
+                    "An element wasn't removed contrary to expected."
+                )
             }
         }
     }
@@ -119,6 +124,43 @@ abstract class AbstractOpenAddressingSetTest {
             }
             println("All clear!")
         }
+
+        //My tests\\
+        val controlSet = mutableSetOf<String>()
+        controlSet.add("aa")
+        controlSet.add("B")
+        controlSet.add("ccc")
+
+        val openAddressingSet = create<String>(11)
+        assertFalse(
+            openAddressingSet.iterator().hasNext(),
+            "Iterator of an empty set should not have any next elements."
+        )
+        for (element in controlSet) {
+            openAddressingSet += element
+        }
+        val iterator1 = openAddressingSet.iterator()
+        val iterator2 = openAddressingSet.iterator()
+        println("Checking if calling hasNext() changes the state of the iterator...")
+        while (iterator1.hasNext()) {
+            assertEquals(
+                iterator2.next(), iterator1.next(),
+                "Calling OpenAddressingSetIterator.hasNext() changes the state of the iterator."
+            )
+        }
+        val openAddressingSetIter = openAddressingSet.iterator()
+        println("Checking if the iterator traverses the entire set...")
+        while (openAddressingSetIter.hasNext()) {
+            controlSet.remove(openAddressingSetIter.next())
+        }
+        assertTrue(
+            controlSet.isEmpty(),
+            "OpenAddressingSetIterator doesn't traverse the entire set."
+        )
+        assertFailsWith<NoSuchElementException>("Something was supposedly returned after the elements ended") {
+            openAddressingSetIter.next()
+        }
+        println("All clear!")
     }
 
     protected fun doIteratorRemoveTest() {

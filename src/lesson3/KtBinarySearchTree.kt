@@ -143,7 +143,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
 
     inner class BinarySearchTreeIterator internal constructor() : MutableIterator<T> {
 
-        private val stack: Stack<Node<T>> = Stack()
+        private val stack = ArrayDeque<Node<T>?>()
         private var next: Node<T>? = null
         private var curr = root
 
@@ -196,8 +196,8 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
             val node = stack.pop()
 
             next = node
-            node.right?.let { pux(it) }
-            return node.value;
+            node?.right?.let { pux(it) }
+            return node!!.value;
         }
 
         /**

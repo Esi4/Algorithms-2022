@@ -14,6 +14,8 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
 
     override var size: Int = 0
 
+    private enum class Delete { REMOVED }
+
     /**
      * Индекс в таблице, начиная с которого следует искать данный элемент
      */
@@ -51,7 +53,7 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
         val startingIndex = element.startingIndex()
         var index = startingIndex
         var current = storage[index]
-        while (current != null) {
+        while (current != null && current != Delete.REMOVED) {
             if (current == element) {
                 return false
             }
@@ -76,7 +78,21 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
      * Средняя
      */
     override fun remove(element: T): Boolean {
-        TODO("not implemented")
+        val startingIndex = element.startingIndex()
+        var index = startingIndex
+        var current = storage[index]
+
+        while (current != null && current != Delete.REMOVED) {
+            if (current == element) {
+                storage[index] = Delete.REMOVED
+                size--
+                return true
+            }
+            index = (index + 1) % capacity
+            if (index == startingIndex) return false
+            current = storage[index]
+        }
+        return false
     }
 
     /**
@@ -90,6 +106,42 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
      * Средняя (сложная, если поддержан и remove тоже)
      */
     override fun iterator(): MutableIterator<T> {
-        TODO("not implemented")
+        return OpenAddressingSetIterator()
+    }
+
+    inner class OpenAddressingSetIterator internal constructor() : MutableIterator<T> {
+        private var index = 0
+        private var count = -1
+        private var cur: Any? = null
+
+        private fun pux() {
+            while (index < capacity && (storage[index] == null
+                        || storage[index] == Delete.REMOVED)
+            ) {
+                index++
+            }
+        }
+
+        init {
+            pux()
+        }
+
+        override fun hasNext(): Boolean = capacity > index
+
+        override fun next(): T {
+            if (!hasNext()) throw NoSuchElementException()
+            cur = storage[index]
+            count = index
+            index++
+            pux()
+            return storage[count] as T
+        }
+
+        override fun remove() {
+            if (count == -1) throw IllegalStateException()
+            checkNotNull(cur)
+            storage[count] = Delete.REMOVED
+            size--
+        }
     }
 }

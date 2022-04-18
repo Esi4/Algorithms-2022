@@ -154,6 +154,10 @@ abstract class AbstractBinarySearchTreeTest {
                 binarySet.remove(555555555),
                 "No such element exists"
             )
+            assertFalse(
+                binarySet.remove(666),
+                "No such element exists"
+            )
             assertEquals(
                 expectedSize, binarySet.size,
                 "The size of the tree is incorrect: was ${binarySet.size}, should've been $expectedSize."

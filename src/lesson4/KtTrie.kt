@@ -1,6 +1,7 @@
 package lesson4
 
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Префиксное дерево для строк
@@ -71,7 +72,62 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
      * Сложная
      */
     override fun iterator(): MutableIterator<String> {
-        TODO()
+        return TrieIterator()
+    }
+
+    inner class TrieIterator internal constructor() : MutableIterator<String> {
+        private val stack = LinkedList<String>()
+        private var chars = ArrayList<String>()
+        private var limit = root.children.size
+        private var count = 0
+        private var word = ""
+        private var currentW = ""
+
+        private fun pass() {
+            if (count < limit) {
+                word = chars[count]
+                findNode(chars[count])?.let { passBranch(it) }
+                count++
+            }
+        }
+
+        private fun passBranch(node: Node) {
+            val map = node.children
+            for ((key, value) in map) {
+                if (key.code == 0) stack.add(word)
+                word += key
+                passBranch(value)
+            }
+            if (word.isNotEmpty()) word = word.substring(0, word.length - 1)
+        }
+
+        init {
+            val map = root.children
+            map.forEach { chars.add(it.key.toString()) }
+            pass()
+        }
+
+        //T = O(const)
+        //R = O(1)
+        override fun hasNext(): Boolean {
+            return stack.isNotEmpty()
+        }
+
+        //T = O(const)
+        //R = O(2N) N
+        override fun next(): String {
+            if (stack.peek() == null) throw NoSuchElementException()
+            currentW = stack.poll()
+            if (stack.peek() == null) pass()
+            return currentW
+        }
+
+        //T = O(N)
+        //R == O(1)
+        override fun remove() {
+            if (!remove(currentW)) throw IllegalStateException()
+        }
+
     }
 
 }
