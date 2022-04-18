@@ -77,6 +77,9 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
      *
      * Средняя
      */
+    //T = O(N) при хорошем раскладе
+    //T = O(1) при нехорошем раскладе
+    //R = O(1)
     override fun remove(element: T): Boolean {
         val startingIndex = element.startingIndex()
         var index = startingIndex
@@ -110,9 +113,9 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
     }
 
     inner class OpenAddressingSetIterator internal constructor() : MutableIterator<T> {
+        private var cur: Any? = null
         private var index = 0
         private var count = -1
-        private var cur: Any? = null
 
         private fun pux() {
             while (index < capacity && (storage[index] == null
@@ -126,8 +129,13 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
             pux()
         }
 
+        //T = O(1)
+        //R = O(1)
         override fun hasNext(): Boolean = capacity > index
 
+        //T = O(N) при хорошем раскладе
+        //T = O(1) при нехорошем раскладе
+        //R = O(1)
         override fun next(): T {
             if (!hasNext()) throw NoSuchElementException()
             cur = storage[index]
@@ -137,6 +145,8 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
             return storage[count] as T
         }
 
+        //T = O(1)
+        //R = O(1)
         override fun remove() {
             if (count == -1) throw IllegalStateException()
             checkNotNull(cur)

@@ -55,6 +55,8 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
         return modified
     }
 
+    //T = O(N)
+    //R == O(1)
     override fun remove(element: String): Boolean {
         val current = findNode(element) ?: return false
         if (current.children.remove(0.toChar()) != null) {
