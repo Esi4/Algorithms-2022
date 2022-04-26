@@ -77,8 +77,8 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
      *
      * Средняя
      */
-    //T = O(N) при хорошем раскладе
-    //T = O(1) при нехорошем раскладе
+    //T = O(1) при хорошем раскладе
+    //T = O(N) при нехорошем раскладе
     //R = O(1)
     override fun remove(element: T): Boolean {
         val startingIndex = element.startingIndex()
