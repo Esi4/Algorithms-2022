@@ -104,9 +104,12 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
         }
 
         init {
-            val map = root.children
-            map.forEach { chars.add(it.key.toString()) }
-            pass()
+            val map = sortedMapOf<Char, Node>()
+            root.children.forEach {
+                map[it.key] = it.value
+                chars.add(it.key.toString())
+                pass()
+            }
         }
 
         //T = O(const)

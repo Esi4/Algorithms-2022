@@ -2,6 +2,8 @@
 
 package lesson6
 
+import java.util.LinkedList
+
 /**
  * Эйлеров цикл.
  * Средняя
@@ -28,8 +30,67 @@ package lesson6
  * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
  * связного графа ровно по одному разу
  */
+//T = O(E)
+//R = O(2E)
 fun Graph.findEulerLoop(): List<Graph.Edge> {
-    TODO()
+    if (!isPossible(this)) {
+        return mutableListOf()
+    }
+
+    return eulerLoop(this)
+}
+
+private fun eulerLoop(graph: Graph): List<Graph.Edge> {
+    val path = mutableListOf<Graph.Edge>()
+    val stack = LinkedList<Graph.Vertex>()
+    var start = graph.vertices.first()
+    var lastVertices: Graph.Vertex
+    val edges = graph.edges
+    var flag: Boolean
+
+    stack.push(start)
+
+    while (stack.isNotEmpty()) {
+        lastVertices = stack.peek()
+        flag = true
+
+        graph.getNeighbors(lastVertices).forEach {
+            val e = graph.getConnection(lastVertices, it)
+            if (edges.contains(e) && flag) {
+                edges.remove(e)
+                stack.push(it)
+                flag = false
+            }
+        }
+
+        if (flag) {
+            if (start == lastVertices) {
+                stack.pop()
+                lastVertices = stack.peek()
+            }
+            stack.pop()
+            graph.getConnection(lastVertices, start)?.let { path.add(it) }
+            start = lastVertices
+        }
+    }
+
+    if (edges.isNotEmpty()) return mutableListOf()
+    return path
+}
+
+private fun isPossible(graph: Graph): Boolean {
+    if (graph.vertices.isEmpty()) {
+        return false
+    }
+
+    graph.vertices.forEach {
+        if (graph.getConnections(it).size % 2 != 0 ||
+            graph.getConnections(it).isEmpty()
+        ) {
+            return false
+        }
+    }
+    return true
 }
 
 /**
@@ -89,7 +150,26 @@ fun Graph.minimumSpanningTree(): Graph {
  * Если на входе граф с циклами, бросить IllegalArgumentException
  */
 fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
-    TODO()
+    val res = mutableListOf<MutableSet<Graph.Vertex>>()
+    var final = mutableSetOf<Graph.Vertex>()
+    val ver = this.vertices
+
+    if (ver.isEmpty()) return final
+
+    for (i in ver) {
+        val indep = mutableSetOf<Graph.Vertex>()
+        val neighbors = mutableListOf<Graph.Vertex>()
+        for (j in ver) {
+            if (!neighbors.contains(j) && !this.getNeighbors(i).contains(j)) {
+                indep.add(j)
+                neighbors.addAll(this.getNeighbors(j))
+            }
+        }
+        res.add(indep)
+    }
+
+    res.forEach { if (it.size > final.size) final = it }
+    return final
 }
 
 /**

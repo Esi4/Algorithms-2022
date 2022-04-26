@@ -133,8 +133,8 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
         //R = O(1)
         override fun hasNext(): Boolean = capacity > index
 
-        //T = O(N) при хорошем раскладе
-        //T = O(1) при нехорошем раскладе
+        //T = O(1) при хорошем раскладе
+        //T = O(N) при нехорошем раскладе
         //R = O(1)
         override fun next(): T {
             if (!hasNext()) throw NoSuchElementException()
