@@ -149,6 +149,8 @@ fun Graph.minimumSpanningTree(): Graph {
  *
  * Если на входе граф с циклами, бросить IllegalArgumentException
  */
+//T = O(N^2)
+//R = O(N)
 fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
     val res = mutableListOf<MutableSet<Graph.Vertex>>()
     var final = mutableSetOf<Graph.Vertex>()
